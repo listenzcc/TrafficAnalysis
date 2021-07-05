@@ -1,1 +1,6 @@
 *.drawio
+*.png
+__pycache__
+middleResults
+
+.env

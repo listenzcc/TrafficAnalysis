@@ -48,3 +48,7 @@ The Project contains `3` components as planned
 - 2020-07-04
   - Initialize the project;
   - Build Initial Overview.
+
+- 2020-07-05
+  - Setup .vscode dot files;
+  - Developed [random_layout.py](./Construction/random_layout.py "random_layout.py") V0.0.

@@ -1,0 +1,7 @@
+{
+    "python.terminal.activateEnvInCurrentTerminal": true,
+    "terminal.integrated.env.windows": {
+        "pythonpath": "${workspaceFolder}"
+    },
+    "python.envFile": "${workspaceFolder}/.env"
+}
