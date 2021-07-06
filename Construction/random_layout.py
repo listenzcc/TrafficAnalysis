@@ -6,12 +6,7 @@ Purpose: Random Layout the Road Nodes
 '''
 
 # %%
-import os
-import numpy as np
-import pandas as pd
-from settings import Num, MiddleFolder
-
-import plotly.express as px
+from settings import *
 
 # %%
 data = np.random.randint(0, 100, (Num, 2))

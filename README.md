@@ -51,4 +51,8 @@ The Project contains `3` components as planned
 
 - 2020-07-05
   - Setup .vscode dot files;
-  - Developed [random_layout.py](./Construction/random_layout.py "random_layout.py") V0.0.
+  - Developed [random_layout.py](./Construction/random_layout.py "random_layout.py") V0.0, Randomly Set Nodes.
+
+- 2020-07-06
+  - Improve [settings.py](./settings.py "settings.py");
+  - Developed [least_length.py](./RouteLayout/least_length.py "least_length.py") V0.0, Compute Least Length Route.

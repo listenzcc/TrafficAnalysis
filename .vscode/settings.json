@@ -3,5 +3,8 @@
     "terminal.integrated.env.windows": {
         "pythonpath": "${workspaceFolder}"
     },
-    "python.envFile": "${workspaceFolder}/.env"
+    "python.envFile": "${workspaceFolder}/.env",
+    "cSpell.words": [
+        "iloc"
+    ]
 }
