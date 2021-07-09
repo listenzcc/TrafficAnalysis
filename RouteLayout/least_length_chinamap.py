@@ -1,21 +1,80 @@
 '''
 FileName: least_length.py
 Author: Chuncheng
-Version: V0.2
+Version: V0.11
 Purpose: Layout Route by Least Length Law
+         Special Version of China Map
 '''
 
 # %%
+import json
+import geopandas as gpd
 from sklearn.cluster import SpectralClustering
 from settings import *
 
 # %%
-# ------------------------------------------------------
-# Functions
-# ------------------------------------------------------
+GeoDataFolder
+
+# %%
 
 
-@timer
+def read_geojson(adcode):
+    '''
+    Method: read_geojson
+
+    Read GeoJson of [adcode],
+    and Generate Features.
+
+    Args:
+    - @adcode
+
+    Outputs:
+    - The features
+
+    '''
+    path = os.path.join(GeoDataFolder, '{}_full.json'.format(adcode))
+    try:
+        geojson = json.load(open(path))
+    except FileNotFoundError:
+        return None
+    print('D: Fetched GeoJson from {}'.format(path))
+
+    features = gpd.GeoDataFrame.from_features(geojson['features'])
+    features = pd.DataFrame(features)
+    # Overwrite the Geometry to Prevent Too Large
+    features['geometry'] = '--'
+    print('D: Parsed Features from {}'.format(adcode))
+
+    features = features.query('adcode != "{}"'.format(adcode))
+    return features
+
+
+# %%
+df = read_geojson(100000)
+
+dfs = []
+for code in tqdm(df['adcode'].values):
+    dfs.append(read_geojson(code))
+
+df_all = pd.concat(dfs, axis=0)
+df_all.index = range(len(df_all))
+df_all['parent'] = df_all['parent'].map(lambda e: e['adcode'])
+df_all
+
+# %%
+
+d = np.array([e for e in df_all['center'].values if isinstance(e, list)])
+nodes = pd.DataFrame(d, columns=['x', 'y'])
+nodes
+
+# %%
+# nodes = pd.read_json(os.path.join(MiddleFolder, 'nodes.json'))
+# nodes
+
+# %%
+
+
+@ timer
 def mk_route_least_length(df, dist=None, start=0, end=-1):
     '''
     Method: mk_route_least_length
@@ -79,6 +138,73 @@ def mk_route_least_length(df, dist=None, start=0, end=-1):
             break
 
     return route, dist
+
+
+# %%
+route, dist = mk_route_least_length(nodes.copy())
+
+# %%
+clustering = SpectralClustering(n_clusters=15,
+                                affinity='precomputed',
+                                assign_labels='discretize')
+
+_dist = dist.copy()
+_dist[dist == np.inf] = 0
+
+_map = dist > -1
+for r in route:
+    _map[r[0], r[1]] = False
+    _map[r[1], r[0]] = False
+_map
+_dist[_map] = 0
+
+label = clustering.fit_predict(_dist)
+
+# %%
+
+links = []
+for j, r in enumerate(route):
+    a = nodes.loc[r[0]]
+    b = nodes.loc[r[1]]
+    l = str(label[r[0]])
+    nodes.loc[r[0], 'label'] = l
+    nodes.loc[r[1], 'label'] = l
+    links.append((a[0], a[1], j, l))
+    links.append((b[0], b[1], j, l))
+
+nodes['name'] = df_all['name']
+links = pd.DataFrame(links, columns=['x', 'y', 'group', 'label'])
+
+# %%
+size_kwargs = dict(
+    width=600,
+    height=500
+)
+fig1 = px.scatter(nodes, x='x', y='y', hover_name='name',
+                  color='label', title='Scatter Plot', **size_kwargs)
+fig1.show()
+fig2 = px.line(links, x='x', y='y', line_group='group',
+               color='label', **size_kwargs)
+fig2.show()
+
+# %%
+fig = go.Figure()
+
+for d in fig1.data:
+    d['marker']['opacity'] = 0.2
+    d['marker']['color'] = 'gray'
+    fig.add_trace(d)
+
+for d in fig2.data:
+    fig.add_trace(d)
+
+fig.update_layout({'title': 'Least Length Route',
+                   'width': 600, 'height': 500})
+fig.show()
+
+# %%
+
+# %%
 
 
 def mk_routeDict(route):
@@ -149,86 +275,10 @@ def trace_route(start, end, rd):
 
 
 # %%
-# ------------------------------------------------------
-# Load the Nodes
-# ------------------------------------------------------
-
-nodes = pd.read_json(os.path.join(MiddleFolder, 'nodes.json'))
-nodes
-
-# %%
-# ------------------------------------------------------
-# Routing and Labeling
-# ------------------------------------------------------
-
-# Estimate the Least Length Routing,
-# and the Distance Matrix is computed
-route, dist = mk_route_least_length(nodes.copy())
-
-# %%
-# Spectral Clustering based on the Dist and Routing
-clustering = SpectralClustering(n_clusters=4,
-                                affinity='precomputed',
-                                assign_labels='discretize')
-
-_dist = dist.copy()
-_dist[dist == np.inf] = 0
-
-_map = dist > -1
-for r in route:
-    _map[r[0], r[1]] = False
-    _map[r[1], r[0]] = False
-_map
-_dist[_map] = 0
-
-label = clustering.fit_predict(_dist)
-
-# %%
-# Make Links Table of the Routing
-
-links = []
-for j, r in enumerate(route):
-    a = nodes.loc[r[0]]
-    b = nodes.loc[r[1]]
-    l = str(label[r[0]])
-    nodes.loc[r[0], 'label'] = l
-    nodes.loc[r[1], 'label'] = l
-    links.append((a[0], a[1], j, l))
-    links.append((b[0], b[1], j, l))
-
-nodes['name'] = nodes.index
-
-links = pd.DataFrame(links, columns=['x', 'y', 'group', 'label'])
-
-# %%
-# Plot the Least Legnth Routing Figures
-fig1 = px.scatter(nodes, x='x', y='y', color='label',
-                  hover_name='name', title='Scatter Plot')
-fig1.show()
-fig2 = px.line(links, x='x', y='y', line_group='group', color='label')
-fig2.show()
-
-fig = go.Figure()
-for d in fig1.data:
-    fig.add_trace(d)
-for d in fig2.data:
-    fig.add_trace(d)
-fig.update_layout({'title': 'Least Length Route'})
-fig.show()
-
-
-# %%
-# ------------------------------------------------------
-# Path Tracing
-# ------------------------------------------------------
-
-# Compute Routing Dictionary for Trace Shortest Path
 rd = mk_routeDict(route)
 
 # %%
-# Plot the Example Shortest Path
 a, b = [np.random.randint(0, len(nodes)) for _ in range(2)]
-a, b = [86, 55]
 trace = trace_route(a, b, rd)
 print(trace[0], trace[-1], len(trace))
 
@@ -244,18 +294,12 @@ for d in fig11.data:
     fig.add_trace(d)
 
 for d in fig2.data:
-    d['line']['width'] = 0.5
     fig.add_trace(d)
 
 fig.update_layout({'title': 'Least Length Route {} -> {}'.format(a, b)})
 fig.show()
 
 # %%
-# ------------------------------------------------------
-# Estimate Distances
-# ------------------------------------------------------
-
-# Estimate the Path Distances between Each Two Nodes
 n = len(nodes)
 dist_graph = np.zeros((n, n))
 for a in tqdm(range(n)):
@@ -265,43 +309,7 @@ for a in tqdm(range(n)):
 dist_graph
 
 # %%
-# Plot Histogram of the Distances
 fig = px.histogram(dist_graph.ravel(), title='Histogram of Distance in Graph')
-fig.show()
-
-# %%
-# Separate Within- and Across-Labels Distances
-across = []
-within = []
-
-n = len(nodes)
-
-for j in range(n):
-    for k in range(n):
-        if j == k:
-            continue
-
-        v = dist_graph[j, k]
-
-        if nodes['label'][j] == nodes['label'][k]:
-            within.append(v)
-        else:
-            across.append(v)
-
-# %%
-# Plot Histogram of the Distances
-df1 = pd.DataFrame(within)
-df1.columns = ['y']
-df1['name'] = 'within'
-
-df2 = pd.DataFrame(across)
-df2.columns = ['y']
-df2['name'] = 'across'
-
-df = pd.concat([df1, df2], axis=0, ignore_index=True)
-
-fig = px.histogram(df, x='y', color='name', opacity=0.8,
-                   title='Histogram of Separation')
 fig.show()
 
 # %%

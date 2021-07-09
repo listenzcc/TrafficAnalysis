@@ -22,6 +22,9 @@ Num = 100
 # Folder of middleResults
 MiddleFolder = os.path.join(__file__, '..', 'middleResults')
 
+# Folder of GeoData
+GeoDataFolder = os.path.join(os.environ['SYNC'], 'GeoData', 'json-files')
+
 # Timer Wrapper
 
 

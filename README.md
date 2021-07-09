@@ -56,3 +56,11 @@ The Project contains `3` components as planned
 - 2020-07-06
   - Improve [settings.py](./settings.py "settings.py");
   - Developed [least_length.py](./RouteLayout/least_length.py "least_length.py") V0.0, Compute Least Length Route.
+
+- 2020-07-07
+  - Improve [least_length.py](./RouteLayout/least_length.py "least_length.py") to V0.1;
+  - Added Graph Spectral Clustering method and Compute Distance in Graph Space.
+
+- 2020-07-08
+  - Developed [least_length_chinamap.py](./RouteLayout/least_length_chinamap.py "least_length_chinamap") V0.11;
+  - It is a special Version for Explaining Spectral Clustering.

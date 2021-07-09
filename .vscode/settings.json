@@ -5,6 +5,11 @@
     },
     "python.envFile": "${workspaceFolder}/.env",
     "cSpell.words": [
-        "iloc"
+        "chinamap",
+        "discretize",
+        "iloc",
+        "plotly",
+        "sklearn",
+        "tqdm"
     ]
 }
