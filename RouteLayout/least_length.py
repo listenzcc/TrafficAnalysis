@@ -277,10 +277,7 @@ within = []
 n = len(nodes)
 
 for j in range(n):
-    for k in range(n):
-        if j == k:
-            continue
-
+    for k in range(j):
         v = dist_graph[j, k]
 
         if nodes['label'][j] == nodes['label'][k]:
@@ -303,5 +300,12 @@ df = pd.concat([df1, df2], axis=0, ignore_index=True)
 fig = px.histogram(df, x='y', color='name', opacity=0.8,
                    title='Histogram of Separation')
 fig.show()
+
+# %%
+
+dump_middle('_hist_sparate_trivial.dump', (df1, df2))
+
+# %%
+df
 
 # %%

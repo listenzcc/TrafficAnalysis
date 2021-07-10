@@ -64,3 +64,12 @@ The Project contains `3` components as planned
 - 2020-07-08
   - Developed [least_length_chinamap.py](./RouteLayout/least_length_chinamap.py "least_length_chinamap") V0.11;
   - It is a special Version for Explaining Spectral Clustering.
+
+- 2020-07-09
+  - Developed [least_length_superGraph.py](./RouteLayout/least_length_superGraph.py "least_length_superGraph") V0.0;
+  - The Script is Developed based on [least_length.py](./RouteLayout/least_length.py "least_length.py") to V0.1;
+  - It is used for Compute ShortCuts between Labels.
+
+- 2020-07-10
+  - Improved [settings.py](./settings.py "settings");
+  - Add Overall Dumping and Loading Methods.

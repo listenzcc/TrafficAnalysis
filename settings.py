@@ -14,6 +14,8 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 
+from joblib import dump, load
+
 from tqdm.auto import tqdm
 
 # Number of Road Nodes
@@ -29,6 +31,7 @@ GeoDataFolder = os.path.join(os.environ['SYNC'], 'GeoData', 'json-files')
 
 
 def timer(func):
+    ''' Wrapper of Timer '''
     def func_wrapper(*args, **kwargs):
         from time import time
         time_start = time()
@@ -38,3 +41,19 @@ def timer(func):
         print('\nTime Costing: {}: {:0.4f} s\n'.format(func.__name__, time_spend))
         return result
     return func_wrapper
+
+
+def dump_middle(name, obj):
+    ''' Dump Middle Results of [obj] to [name]'''
+    p = os.path.join(MiddleFolder, name)
+    if os.path.isfile(p):
+        print('W: File Override Warning: {}'.format(p))
+    dump(obj, p)
+    print('D: Saved New File: {}'.format(p))
+    return p
+
+
+def load_middle(name):
+    p = os.path.join(MiddleFolder, name)
+    print('D: Loading Middle Results of {}'.format(p))
+    return load(p)
