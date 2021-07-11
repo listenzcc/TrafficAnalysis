@@ -42,7 +42,7 @@ def mk_route_least_length(df, dist=None, start=0, end=-1):
 
     assert(n > 3)
 
-    d = df.values.copy()
+    d = df[['x', 'y']].values.copy()
     if dist is None:
         dist = np.zeros((n, n))
         for j in range(n):
@@ -153,7 +153,7 @@ def trace_route(start, end, rd):
 # Load the Nodes
 # ------------------------------------------------------
 
-nodes = pd.read_json(os.path.join(MiddleFolder, 'nodes.json'))
+nodes = pd.read_json(os.path.join(MiddleFolder, 'random_layout.json'))
 nodes
 
 # %%
