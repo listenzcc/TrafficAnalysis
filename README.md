@@ -73,3 +73,8 @@ The Project contains `3` components as planned
 - 2020-07-10
   - Improved [settings.py](./settings.py "settings");
   - Add Overall Dumping and Loading Methods.
+
+- 2020-07-11
+  - Re-Organizing the Program;
+  - The Process is Under-Going;
+  - Until Now, the Global Part of the [utils](./RouteLayout/utils "utils") is Developed.

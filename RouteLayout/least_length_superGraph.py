@@ -384,7 +384,7 @@ def shortest_trace(start, end, new_dist):
         if end == b:
             break
 
-    print(len(memory[0]))
+    # print(len(memory[0]))
 
     return trace_back(end)
 
