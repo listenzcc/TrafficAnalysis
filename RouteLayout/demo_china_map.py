@@ -6,15 +6,22 @@ Purpose: Demo of Routing of China Map
 '''
 
 # %%
-from utils.layout_nodes import layout_chinese_cities, layout_random
-from utils.route_nodes import route_least_length, plot_routing
+from utils.viz import plot_layout
+from utils.graph_methods import compute_dist, mask_dist, spectral_clustering
+from utils.layout_methods import layout_random, layout_chinese_cities
+from utils.routing_methods import route_least_length
 
 # %%
 nodes = layout_chinese_cities()
-nodes = layout_random()
 
-route, dist = route_least_length(nodes)
+# %%
+dist = compute_dist(nodes)
+links = route_least_length(nodes, dist)
+mdist = mask_dist(dist, links)
+labels = spectral_clustering(mdist)
+plot_layout(nodes, color=[str(e) for e in labels])
 
-fig = plot_routing(nodes, route)
+# %%
+plot_layout(nodes, color=[str(e) for e in labels], links=links)
 
 # %%

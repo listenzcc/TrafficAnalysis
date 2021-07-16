@@ -30,7 +30,7 @@ def Path(name, folder=MiddleFolder):
 
 
 def Debug(msg):
-    print('>>> D: {}'.format(msg))
+    print('--- D: {}'.format(msg))
 
 
 def Info(msg):

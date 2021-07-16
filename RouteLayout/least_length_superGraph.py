@@ -324,7 +324,7 @@ links = plot_routing(nodes, new_route, label)
 memory = [pd.DataFrame(columns=['pair', 'dist'])]
 
 
-# @timer
+@timer
 def shortest_trace(start, end, new_dist):
     '''
     Method: shortest_trace
@@ -388,8 +388,71 @@ def shortest_trace(start, end, new_dist):
 
     return trace_back(end)
 
+# %%
+
+
+memory = dict()
+
+
+# @timer
+def shortest_trace(start, end, dist):
+    '''
+    Method: shortest_trace
+
+    Compute the Shortest Trace of the Common Graph.
+    The [dist] is the distance matrix of the available Edges,
+    the <inf> values refers the Edge is invalid.
+
+    Args:
+    - @start, end, dist
+
+    Outputs:
+    - The Computed Trace
+
+    '''
+    inside = [start]
+    outside = [e for e in range(len(dist)) if not e == start]
+
+    trace = dict()
+
+    accum = np.zeros(dist.shape)
+
+    def trace_back(e):
+        back = [e]
+        while back[-1] != start:
+            back.append(trace[back[-1]])
+        return back[::-1]
+
+    for ____ in dist:
+        x = dist + accum
+        _dist = x[inside][:, outside]
+        a, b = np.unravel_index(np.argmin(_dist), _dist.shape)
+        a, b = inside[a], outside[b]
+        trace[b] = a
+        inside.append(b)
+        outside.remove(b)
+        accum[b, :] = x[a, b]
+        if b == end:
+            break
+        if len(outside) == 0:
+            break
+
+    tbr = trace_back(end)
+
+    tb = tbr.copy()
+    while len(tb):
+        for j in range(len(tb)-1):
+            memory[(tb[j], tb[-1])] = tb[j:]
+
+        for j in range(1, len(tb)):
+            memory[(tb[0], tb[j])] = tb[:j]
+
+        tb = tb[1:-1]
+
+    return tbr
 
 # %%
+
 
 a, b = [np.random.randint(0, len(nodes)) for _ in range(2)]
 # a, b = 75, 63
@@ -403,7 +466,7 @@ _dist = dist.copy()
 _dist[_map == 0] = np.inf
 
 trace = shortest_trace(a, b, _dist)
-print(len(trace))
+print(a, b, len(trace), trace)
 
 _nodes = nodes.loc[trace]
 _nodes['name'] = _nodes.index
@@ -423,8 +486,6 @@ for d in fig2.data:
 fig.update_layout({'title': 'Least Length Route {} -> {}'.format(a, b)})
 fig.show()
 
-# memory[0]
-
 # %%
 # ------------------------------------------------------
 # Estimate Distances
@@ -435,11 +496,13 @@ n = len(nodes)
 dist_graph = np.zeros((n, n))
 for a in tqdm(range(n)):
     for b in range(a):
-        if (a, b) in list(memory[0]['pair']):
-            d = memory[0][memory[0]['pair'] == (a, b)]['dist'].iloc[0]
-        else:
-            d = len(shortest_trace(a, b, _dist))
-        dist_graph[a][b] = d
+        t = memory.get((a, b), shortest_trace(a, b, _dist))
+        # if (a, b) in memory:
+        #     d = memory[(a, b)]
+        #     d = memory[0][memory[0]['pair'] == (a, b)]['dist'].iloc[0]
+        # else:
+        #     d = len(shortest_trace(a, b, _dist))
+        dist_graph[a][b] = len(t)
 
 dist_graph
 
@@ -479,4 +542,6 @@ fig.show()
 # %%
 dump_middle('_hist_sparate_improve.dump', (df1, df2))
 
+# %%
+memory
 # %%

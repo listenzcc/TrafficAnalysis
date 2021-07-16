@@ -10,6 +10,7 @@ import os
 
 # Computations
 import numpy as np
+from sklearn.cluster import SpectralClustering
 
 # Pandas
 import pandas as pd
