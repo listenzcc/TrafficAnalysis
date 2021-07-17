@@ -92,3 +92,6 @@ The Project contains `3` components as planned
   - Improve the Structure of the Project;
   - Almost All the Functions are Moved into the Package of [utils](./RouteLayout/utils "utils");
   - The Improvement is Under-Going.
+
+- 2020-07-17
+  - Improved the Package of [utils](./RouteLayout/utils "utils").

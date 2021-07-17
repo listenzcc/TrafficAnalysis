@@ -1,4 +1,5 @@
 *.drawio
+*.ipynb
 *.png
 __pycache__
 middleResults
