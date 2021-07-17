@@ -14,5 +14,9 @@
         "plotly",
         "sklearn",
         "tqdm"
+    ],
+    "python.analysis.extraPaths": [
+        "C:\\\\Users\\\\zcc\\\\anaconda3\\\\lib\\\\site-packages",
+        "./RouteLayout"
     ]
 }

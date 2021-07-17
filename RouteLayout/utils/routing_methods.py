@@ -31,7 +31,7 @@ def route_between_labels(nodes, dist, labels):
     Debug('Routing Between Labels with {} Nodes and {} Labels'.format(
         n, len(uniques)))
 
-    for a in tqdm(range(n)):
+    for a in range(n):
         for b in range(n):
             if labels[a] == labels[b]:
                 _dist[a, b] = np.inf
@@ -43,7 +43,7 @@ def route_between_labels(nodes, dist, labels):
 
     while len(_nodes['label'].unique()) > 1:
         # Block All the Same-Label Edges
-        for j in tqdm(_nodes.index):
+        for j in _nodes.index:
             l = _nodes.loc[j, 'label']
             ks = _nodes.query('label=="{}"'.format(l)).index
             _dist[j, ks] = np.inf
@@ -63,17 +63,18 @@ def route_between_labels(nodes, dist, labels):
         print(_nodes['label'].unique())
 
         links.append((a, b))
-        Debug('D: Linked Nodes {}({}) -> {}({})'.format(a, la, b, lb))
+        Debug('D: Linked Nodes {}({}) -> {}({}), {}'.format(
+            a, la, b, lb, _dist[a, b]))
 
     return links
 
 
 @Timer
-def route_least_length(nodes, dist, start=0):
+def route_least_length(dist, start=0):
     '''
     Method: route_least_length
 
-    Compute Routing of the [nodes] with Least Length Principle using Greedy Algorithm,
+    Compute Routing of the Nodes with Least Length Principle using Greedy Algorithm,
     in which the Distance Matrix [dist] between the Nodes is required,
 
     The List of the Edges in the Routing is Computed and Returned.
@@ -82,7 +83,6 @@ def route_least_length(nodes, dist, start=0):
     which is the Index of a Node.
 
     Args:
-    - @nodes: The Nodes in DataFrame;
     - @dist: The Distance Matrix;
     - @start: The Index of the Start Node.
 
@@ -92,7 +92,7 @@ def route_least_length(nodes, dist, start=0):
 
     '''
 
-    n = len(nodes)
+    n = len(dist)
 
     # Fail on Not Enough Nodes
     if not n > 3:
@@ -101,28 +101,23 @@ def route_least_length(nodes, dist, start=0):
 
     # Prepare Routing
     links = []
-    nodes['state'] = 'outside'
 
-    # Start with [start]
-    j = np.argmin(dist[start])
-    links.append((start, j))
-    nodes.loc[start, 'state'] = 'inside'
-    nodes.loc[j, 'state'] = 'inside'
-    Debug('Started Routing with {}'.format((start, j)))
+    inside = [start]
+    outside = [e for e in range(n) if not e == start]
+
+    Debug('Started Routing with {}'.format(start))
 
     # Routing with Greedy Algorithm
+    # At the worst, we will loop n times.
     for _ in tqdm(range(n)):
-        inside = nodes.query('state=="inside"').index
-        outside = nodes.query('state=="outside"').index
         _dist = dist[inside][:, outside]
         a, b = np.unravel_index(np.argmin(_dist), _dist.shape)
         a, b = inside[a], outside[b]
         links.append((a, b))
-        nodes.loc[a, 'state'] = 'inside'
-        nodes.loc[b, 'state'] = 'inside'
-
-        if 'outside' not in nodes['state'].values:
-            Debug('Break Adding because No Node is Left.')
+        inside.append(b)
+        outside.remove(b)
+        if len(outside) == 0:
+            Debug('Break Loop because the outside set is empty.')
             break
 
     Debug('Done Routing for {} Nodes'.format(n))

@@ -16,7 +16,7 @@ nodes = layout_chinese_cities()
 
 # %%
 dist = compute_dist(nodes)
-links = route_least_length(nodes, dist)
+links = route_least_length(dist)
 mdist = mask_dist(dist, links)
 labels = spectral_clustering(mdist)
 plot_layout(nodes, color=[str(e) for e in labels])

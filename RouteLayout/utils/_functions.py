@@ -19,7 +19,8 @@ def Timer(func):
         result = func(*args, **kwargs)
         time_end = time()
         time_spend = time_end - time_start
-        print('D: {} costs {:0.4f} seconds\n'.format(func.__name__, time_spend))
+        Debug('AutoTimer: {} costs {:0.4f} seconds\n'.format(
+            func.__name__, time_spend))
         return result
     return func_wrapper
 
